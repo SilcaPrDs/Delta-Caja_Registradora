@@ -10,4 +10,6 @@ de datos de la universidad de oriente edo. Monagas.
 
   Daniuska Cedeño C.I: 32.822.755
 
-  Miguel Moreno C.I: 31399595
+  Miguel Moreno C.I: 31.399.595
+
+  Osmel Deffit C.I: 30.410.640
