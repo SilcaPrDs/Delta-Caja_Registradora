@@ -9,3 +9,5 @@ de datos de la universidad de oriente edo. Monagas.
   Jorge Muzziotti C.I: 30.117.864
 
   Daniuska Cedeño C.I: 32.822.755
+
+  Miguel Moreno C.I: 31399595
