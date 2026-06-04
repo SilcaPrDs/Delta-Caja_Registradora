@@ -13,4 +13,5 @@ de datos de la universidad de oriente edo. Monagas.
   Miguel Moreno C.I: 31.399.595
 
   Osmel Deffit C.I: 30.410.640
+  
   Joseph Vidal C.I:27.556.473
