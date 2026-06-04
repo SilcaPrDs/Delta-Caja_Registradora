@@ -7,3 +7,5 @@ de datos de la universidad de oriente edo. Monagas.
   integrantes:
 
   Jorge Muzziotti C.I: 30.117.864
+
+  Daniuska Cedeño C.I: 32.822.755
