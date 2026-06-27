@@ -31,6 +31,9 @@ int main(){
 	agregar_al_carro("2003", 6);
 	agregar_al_carro("1030", 2);
 	
+	editar_producto("3002");
+	editar_producto("1011");
+	
 	finalizar_compra();
 	
 	realizar_cierre();
