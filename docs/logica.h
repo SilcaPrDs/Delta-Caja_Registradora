@@ -24,5 +24,6 @@ void finalizar_compra();
 void cargar_sistema();
 void realizar_cierre();
 void actualizar_inventario();
+void editar_producto(std::string ID);
 
 #endif 
