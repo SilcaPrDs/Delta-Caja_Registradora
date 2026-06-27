@@ -14,10 +14,10 @@ deque <compra> factura; 							//lista doble enlasada
 queue <string> cierre; 								//cola
 
 
-
+//carga los productos en la tabla hash
 void cargar_sistema(){
 	
-	fstream ARCHIVO("inventario.csv", ios::in);
+	fstream ARCHIVO("inventario.csv", ios::in); //creea un archivo .csv, donde guardar los productos
 	
 	if (!ARCHIVO.is_open()){
 		
@@ -30,12 +30,12 @@ void cargar_sistema(){
 			stringstream ss(linea);
 			string campo;
 			int i = 0;
-			producto temporal = {"", "", 0, 0};
+			producto temporal = {"", "", 0, 0};		//producto temporal para agregar a la tabla hash
 			bool campo_valido = true;
 			
 			while (getline(ss, campo, ';')){
 	
-				try{
+				try{								//intenta guardar los datos en el producto temporal
 					switch(i){
 						case 0: temporal.ID = campo; break;
 						case 1: temporal.nombre = campo; break;
@@ -44,7 +44,7 @@ void cargar_sistema(){
 					}
 				}catch(...){
 					
-					campo_valido = false;
+					campo_valido = false;	//si falla, laza un error
 					cout<<"ERROR: posibles archivos corruptos"<<endl;
 					break;
 				}
@@ -52,7 +52,7 @@ void cargar_sistema(){
 				i++;
 			}
 		
-			if(campo_valido){
+			if(campo_valido){				//solo si consigue guardar todos los datos de forma existosa
 				lista_productos[temporal.ID] = temporal;
 			}
 		}
@@ -63,14 +63,12 @@ void cargar_sistema(){
 }
 
 
-
+//grega un nuevo produco
 void agregar_productos(string ID, string NOMBRE, int PRECIO, int CANTIDAD){
 	
-	if (lista_productos.find(ID) != lista_productos.end()){
+	if (lista_productos.find(ID) != lista_productos.end()){	//verfica siel producto existe, si existe lanza un mensaje de error.
 		
-		lista_productos[ID].cantidad += CANTIDAD;
 		cout<<"EL PRODUCTO YA EXISTIA: su cantidad en stock sera actualizada"<<endl;
-		actualizar_inventario();
 		return;
 	}
 	
@@ -92,7 +90,7 @@ void agregar_productos(string ID, string NOMBRE, int PRECIO, int CANTIDAD){
 };
 
 
-
+//actualiza el inventario .csv
 void actualizar_inventario(){
 	
 	ofstream ARCHIVO("inventario.csv");
@@ -113,11 +111,10 @@ void actualizar_inventario(){
 }
 
 
-
+//agrega porductos a la lista de compras doblemente enlasada
 void agregar_al_carro(string ID, int CANTIDAD){
 	
-	auto it = lista_productos.find(ID);
-    if (it == lista_productos.end()) {
+    if (lista_productos.find(ID) == lista_productos.end()) {
         cout << "ERROR: El producto con ID " << ID << " no existe." << endl;
         return;
     }
@@ -128,11 +125,11 @@ void agregar_al_carro(string ID, int CANTIDAD){
     	return;
 	}
 	
-	producto temporal = lista_productos[ID];
+	producto temporal = lista_productos[ID]; //crea un producto temporal para ingresar a la lista dodle enlazada
 	
-	bool ya_estaba = false;
+	bool ya_estaba = false;					//si ya_estaba es true, simplemente suma la canidada nueva
 	
-	for (auto& elemento : factura){
+	for (auto& elemento : factura){			//recorre la lisata para asegrarse de que el elemento no este repetido.
 		
 		if (elemento.articulo.ID == ID){
 			
@@ -142,8 +139,64 @@ void agregar_al_carro(string ID, int CANTIDAD){
 	};
 	
 	
-	if(!ya_estaba) {factura.push_back({temporal, CANTIDAD});}
+	if(!ya_estaba) {factura.push_back({temporal, CANTIDAD});}	//si no estaba, agrega al final el producto temporal mas la cantidad a llevar
 };
+
+
+
+void editar_producto(string ID){
+	
+	producto temporal = {"", "", 0, 0};
+	
+	if (lista_productos.find(ID) != lista_productos.end()){
+		
+		cout<< "producto: " + lista_productos[ID].nombre + "\nprecio: " << lista_productos[ID].precio << "\ncantidad: "<<
+		lista_productos[ID].cantidad << "\nID: " + lista_productos[ID].ID <<endl;
+		
+		cout<<"nuevo precio: ";
+		cin >> temporal.precio;
+		cout<<"nuevo nombre: ";
+		cin >> temporal.nombre;
+		cout<<"nueva cantidad: ";
+		cin >> temporal.cantidad;
+		cout<<"nuevo ID: ";
+		cin >> temporal.ID;
+		
+		lista_productos.erase(ID);
+		lista_productos[temporal.ID] = temporal;
+		actualizar_inventario();
+		
+	}else{
+		
+		int opc;
+		cout<<"producto no existe, desea  agregar un nuevo producto?\n1. si\n0. no"<<endl;
+		cin >>opc;
+		
+		switch (opc){
+			
+			case 0:
+				return;
+			case 1:
+				
+					cout<<"nuevo precio: ";
+					cin >> temporal.precio;
+					cout<<"nuevo nombre: ";
+					cin >> temporal.nombre;
+					cout<<"nueva cantidad: ";
+					cin >> temporal.cantidad;
+					cout<<"nuevo ID: ";
+					cin >> temporal.ID;
+					
+					agregar_productos(temporal.ID, temporal.nombre, temporal.precio, temporal.cantidad);
+					break;
+			default:
+				cout<<"ERROR: no es una opcion"<<endl;
+				break;
+		}
+		
+	}
+}
+
 
 
 
