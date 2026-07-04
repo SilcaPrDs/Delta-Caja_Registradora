@@ -20,10 +20,13 @@ struct compra {
 
 void agregar_productos(const std::string ID, const std::string NOMBRE, int PRECIO, int CANTIDAD);
 void agregar_al_carro(const std::string ID, int CANTIDAD);
-void finalizar_compra();
+void finalizar_compra(const std::string CEDULA);
 void cargar_sistema();
 void realizar_cierre();
 void actualizar_inventario();
-void editar_producto(std::string ID);
+void editar_producto(const std::string ID);
+void facturar();
+void actualizar_BD_clientes(const std::string CEDULA, const std::string NOMBRE);
+
 
 #endif 
