@@ -17,11 +17,11 @@ queue <string> cierre; 								//cola
 //carga los productos en la tabla hash
 void cargar_sistema(){
 	
-	fstream ARCHIVO("inventario.csv", ios::in); //creea un archivo .csv, donde guardar los productos
+	fstream ARCHIVO("inventario.csv", ios::in); //creea un archivo .csv, donde guardar los productos y poder cargarlos al sistema
 	
 	if (!ARCHIVO.is_open()){
 		
-		cout<<"ERROR: archivo no encontrado"<<endl;
+		cout<<"ERROR: archivo no encontrado, en la funcion 'cargar sistema'"<<endl;
 	}else{
 		
 		string linea;
@@ -60,6 +60,36 @@ void cargar_sistema(){
 		ARCHIVO.close();
 		cout<<"PRODUCTOS CARGADOS CORRECTAMENTE!!!"<<endl;
 	}
+	
+	ARCHIVO.open("registro de clientes.csv", ios::in); //creea un archivo .csv, donde guardar a los clientes y poder cargarlos al sistema
+	
+	if (!ARCHIVO.is_open()){
+		
+		cout<<"ERROR: archivo no encontrado"<<endl;
+	}else{
+		
+		string linea;
+		while(getline(ARCHIVO, linea)){
+			
+			stringstream ss(linea);
+			string campo, nombre, cedula;
+			int i = 0;
+			while (getline(ss, campo, ';')){
+				
+				if (i == 0) cedula = campo;
+				if (i == 1) nombre = campo;
+				
+				i++;
+			}
+			
+			personas[cedula] = nombre;
+			
+		}
+		
+		ARCHIVO.close();
+		cout<<"CLIENTES CARGADOS CORRECTAMENTE!!!"<<endl;
+	}
+	
 }
 
 
@@ -68,7 +98,7 @@ void agregar_productos(string ID, string NOMBRE, int PRECIO, int CANTIDAD){
 	
 	if (lista_productos.find(ID) != lista_productos.end()){	//verfica siel producto existe, si existe lanza un mensaje de error.
 		
-		cout<<"EL PRODUCTO YA EXISTIA: su cantidad en stock sera actualizada"<<endl;
+		cout<<"ERORR: el producto ya existia, procede a cancelar la peticion"<<endl;
 		return;
 	}
 	
@@ -79,7 +109,7 @@ void agregar_productos(string ID, string NOMBRE, int PRECIO, int CANTIDAD){
 	
 	if (!ARCHIVO.is_open()){
 		
-		cout<<"ERROR: archivo no encontrado"<<endl;
+		cout<<"ERROR: archivo no encontrado, en la funcion 'agregar productos'"<<endl;
 	}else{
 		
 		ARCHIVO<< ID << ';' << NOMBRE << ';' << PRECIO << ';' << CANTIDAD <<endl;
@@ -97,7 +127,7 @@ void actualizar_inventario(){
 	
 	if (!ARCHIVO.is_open()){
 		
-		cout<<"ERROR: archivo no encontrado"<<endl;
+		cout<<"ERROR: archivo no encontrado, en la funcion 'actualizar inventario'"<<endl;
 	}else{
 		
 		for (const auto& [clave, valor] : lista_productos){
@@ -175,6 +205,7 @@ void editar_producto(string ID){
 		switch (opc){
 			
 			case 0:
+				
 				return;
 			case 1:
 				
@@ -198,9 +229,52 @@ void editar_producto(string ID){
 }
 
 
+// inicia el proceso de facturacion preguntando la cedula
+void facturar(){
+	
+	string cedula;
+	
+	cout<<"cliente: ";
+	cin >>cedula;
+	
+	if (personas.find(cedula) == personas.end()){
+		
+		string nombre;
+		cout<<"persona no registrada, ingrese nombre: ";
+		cin >>nombre;
+		
+		personas[cedula] = nombre;
+		
+		actualizar_BD_clientes(cedula, nombre);
+		finalizar_compra(cedula);
+		
+	}else{
+		
+		cout<<"factura generada bajo el nombre " + personas[cedula] + " C.I: " + cedula<<endl;
+		
+		finalizar_compra(cedula);
+	}
+}
 
 
-void finalizar_compra(){
+//agrega un nuevo cliente a la base de datos
+void actualizar_BD_clientes(string CEDULA, string NOMBRE){
+	
+	fstream ARCHIVO("registro de clientes.csv", ios::app);
+	
+	if (!ARCHIVO.is_open()){
+		
+		cout<<"ERROR: base de datos de clientes no encontrada"<<endl;
+	}else{
+		
+		ARCHIVO<< CEDULA + ';' + NOMBRE <<endl;
+		ARCHIVO.close();
+	}
+}
+
+
+//finaliza  la compra y genera una factura
+void finalizar_compra(string CEDULA){
 	
 	int total = 0;
 	fstream FACTURA("factura.txt", ios::out);
@@ -209,6 +283,8 @@ void finalizar_compra(){
 		
 		cout<<"ERROR NO SE PUDO GENERAR LA FACTURA"<<endl;
 	}else{
+		
+		FACTURA<<"comprador: " + personas[CEDULA] + " C.I: " + CEDULA<<endl;
 		
 		while (!factura.empty()){
 		
