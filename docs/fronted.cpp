@@ -5,7 +5,7 @@
 
 using namespace std;
 
-HWND boton_agregar, campo1, campo2, campo3, campo4;
+HWND boton_agregar, campo1, campo2, campo3, campo4, lista_dinamica, pestana1;
 
 
 /* This is where all the input to the window goes to */
@@ -19,6 +19,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 		}
 		
 		case WM_CREATE: {
+			
 			
 			//boton 1 "agregar producto" con ID 1:
 			boton_agregar = CreateWindowEx(
@@ -116,6 +117,59 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 			//texto de guia para el campo 4:
 			SendMessage(campo4, EM_SETCUEBANNER, TRUE, (LPARAM)L"Cantidad");
 			
+			
+			//lista dinamica ID 6:
+			lista_dinamica = CreateWindowEx(
+			
+			WS_EX_CLIENTEDGE,							//estilo funcion
+			"LISTBOX",									//tipo
+			"",											//texto
+			WS_CHILD | WS_VISIBLE | LBS_STANDARD | LBS_NOTIFY,		//estilos visuales
+			200,50,										//pocision X e Y
+			150,50,										//ancho y alto
+			hwnd,										//ventana padre
+			(HMENU)6,									//identificador ID
+			GetModuleHandle(NULL),						//instancia
+			NULL
+			
+			);
+			
+			SendMessage(lista_dinamica, LB_ADDSTRING, 0, (LPARAM)"Elemento 1");
+			SendMessage(lista_dinamica, LB_ADDSTRING, 0, (LPARAM)"Elemento 2");
+			
+			
+			//pestaña 1 ID 7:
+			pestana1 = CreateWindowEx(
+			
+			0,												//estilo funcion
+			WC_TABCONTROL, 									//tipo
+			"", 											//texto
+			WS_CHILD | WS_VISIBLE,							//estilos visuales
+			0, 0, 											//pocision X e Y
+			0, 0, 											//ancho y alto
+			hwnd, 											//ventana padre
+			(HMENU)7, 										//identificador ID
+			GetModuleHandle(NULL), 							//instancia
+			NULL
+			
+			);
+			
+			//estructura para defeinir ventanas:
+			
+			TCITEM celda;
+			celda.mask = TCIF_TEXT;
+			
+			//definiendo pestaña 1
+			celda.pszText = (LPSTR)"celda 1";
+			//incertando pestaña 1
+			TabCtrl_InsertItem(pestana1, 0, &celda);
+			
+			//definiendo pestaña 2
+			celda.pszText = (LPSTR)"celda 2";
+			//incertando pestaña 2
+			TabCtrl_InsertItem(pestana1, 1, &celda);
+						
+			
 			break;
 		}
 		
@@ -156,14 +210,73 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 				   }
        			
             }
+            
+            break;
+        }
+            
+            case  WM_NOTIFY:{
+            	
+            	NMHDR* nmhdr = (NMHDR*)lParam;
+            	if (nmhdr->code == TCN_SELCHANGE && nmhdr->hwndFrom == pestana1) {
+                
+					int celda_selecta = TabCtrl_GetCurSel(pestana1); //tomamos el inice de la celda seleccionada
+
+           	   		if (celda_selecta == 0) {
+           	   		 	
+            		// mostrar elementos que pertenecen a la celda 1
+            		ShowWindow(boton_agregar, SW_SHOW);
+            		ShowWindow(campo1, SW_SHOW);
+            		ShowWindow(campo2, SW_SHOW);
+            		ShowWindow(campo3, SW_SHOW);
+            		ShowWindow(campo4, SW_SHOW);
+            		// ocultar elementos que no
+            		ShowWindow(lista_dinamica, SW_HIDE);
+            
+            		
+            	    }else if (celda_selecta == 1) {
+            	    	
+                    // Mostrar elementos de la pestaña 2
+                    ShowWindow(boton_agregar, SW_HIDE);
+            		ShowWindow(campo1, SW_HIDE);
+            		ShowWindow(campo2, SW_HIDE);
+            		ShowWindow(campo3, SW_HIDE);
+            		ShowWindow(campo4, SW_HIDE);
+            		
+            		ShowWindow(lista_dinamica, SW_SHOW);
+                }
+            }
+            	
+            	
+				break;
+			}
+			
+			case WM_SIZE:{
+				
+				int ancho = LOWORD(lParam); int alto = HIWORD(lParam); //obtenindo el alto y ancho de la ventana
+				
+				if (pestana1 != NULL){
+					
+					MoveWindow(
+                    pestana1, 
+                    0, 0,           // Posición inicial superior izquierda
+                    ancho,   		// Ocupar todo el ancho disponible
+                    alto,    		// Ocupar todo el alto disponible
+                    TRUE 			// Forzar el repintado inmediato
+                    );
+				}
+				
+				break;
+			}
 			
 			break;
+			
+					/* All other messages (a lot of them) are processed using default procedures */
+			default:
+				return DefWindowProc(hwnd, Message, wParam, lParam);
 		}
 		
-		/* All other messages (a lot of them) are processed using default procedures */
-		default:
-			return DefWindowProc(hwnd, Message, wParam, lParam);
-	}
+
+	
 	return 0;
 }
 
